@@ -1,0 +1,99 @@
+{% extends "tandoori_webapps/webapps_base.html" %}
+
+{% load bootstrap i18n static_utils app_tags %}
+
+{% block css %}
+<style>
+    .demo-charts{
+        margin-top:150px;
+        margin-left:auto;
+        margin-right: auto;
+    }
+</style>
+{% endblock css %}
+
+{% block title %}
+    Webapps login
+{% endblock title %}
+
+{% block app_title %}
+    Webapps login
+{% endblock app_title %}
+
+{% block content %}
+
+<div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-grid">
+
+
+<form class="well" id="login-form" role="form" action="{% url 'login' %}" method="POST">
+    {% csrf_token %}
+    <div class="mdl-textfield mdl-js-textfield">
+      <input class="mdl-textfield__input" type="text" id="id_username" maxlength="254" name="username" />
+      <label class="mdl-textfield__label" for="username">{% trans "Username" %}</label>
+        </div>
+            <div class="mdl-textfield mdl-js-textfield">
+
+      <input class="mdl-textfield__input" type="password" id="id_password" maxlength="254" name="password" />
+      <label class="mdl-textfield__label" for="password">{% trans "Password" %}</label>
+    </div>
+    {% if "next" in request.GET %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {% endif %}
+    <div class="form-group login-button">
+          <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+            {% trans "Connection" %}
+          </button>
+        <button id="nfc_login" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+            {% trans "NFC tag" %}
+          </button>
+    </div>
+
+</form>
+        </div>
+
+{% endblock content %}
+
+{% block footer %}
+
+<footer class="mdl-mini-footer">
+    <div class="mdl-mini-footer--left-section">
+        <ul class="mdl-mini-footer--link-list">
+            <li><a href="" class="btn btn-default btn-primary" data-user-email="sylvain.blot@example.com"{% if STAGING_PWD %} data-user-pass="{{ STAGING_PWD }}"{% endif %}>Sylvain Blot</a></li>
+            <li><a href="" class="btn btn-default btn-primary" data-user-email="antoine.nguyen@example.com"{% if STAGING_PWD %} data-user-pass="{{ STAGING_PWD }}"{% endif %}>Antoine Nguyen</a></li>
+            <li><a href="" class="btn btn-default btn-primary" data-user-email="jean-marie.celerier@example.com"{% if STAGING_PWD %} data-user-pass="{{ STAGING_PWD }}"{% endif %}></a></li>
+            <li><a href="" class="btn btn-default btn-warning" data-user-email="florian.duchene@example.com"{% if STAGING_PWD %} data-user-pass="{{ STAGING_PWD }}"{% endif %}>Florian Duchêne </a></li>
+            <li><a href="" class="btn btn-default btn-warning" data-user-email="thomas.vermersch@example.com"{% if STAGING_PWD %} data-user-pass="{{ STAGING_PWD }}"{% endif %}>Thomas Vermersch </a></li>
+        </ul>
+    </div>
+</footer>
+
+
+{% endblock footer %}
+{% block js %}
+<script type="text/javascript">
+  (function ($) {
+      "use strict";
+
+      $("button#nfc_login").on("click", function(){
+
+      })
+
+      var hash = window.location.hash.substring(1);
+
+      if ( hash === "signup" ) {
+          $("#signup").click();
+      }
+
+      $("footer a").click(function (event) {
+          event.preventDefault();
+          $("#id_username").focus();
+          $("#id_username").val($(this).attr("data-user-email"));
+
+          $("#id_password").focus();
+          if ( $(this).attr("data-user-pass") ) {
+              $("#id_password").val($(this).attr("data-user-pass"));
+          }
+      });
+  }(jQuery));
+</script>
+{% endblock js %}

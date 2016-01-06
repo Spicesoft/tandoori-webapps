@@ -1,0 +1,31 @@
+<%
+    var successClass = "";
+    if (success != null) {
+        successClass = success ? "reservation-success" : "reservation-error";
+    }
+%>
+<div class="panel-body <%= successClass %>">
+    <button type="button" class="close js-reservation-event-delete" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h3 class="panel-title"><%= gettext("Bureau") %></h3>
+    <%
+        var body = "";
+        switch (type) {
+            case 'desk-am':
+                body = interpolate(gettext("Le %s - Matinée"), [from_date.format('D MMMM').replace(/ /g, '&nbsp;')]);
+                break;
+            case 'desk-pm':
+                body = interpolate(gettext("Le %s - Après-midi"), [from_date.format('D MMMM').replace(/ /g, '&nbsp;')]);
+                break;
+            case 'desk-day':
+                body = interpolate(gettext("Le %s - Journée"), [from_date.format('D MMMM').replace(/ /g, '&nbsp;')]);
+                break;
+            case 'desk-month':
+                body = interpolate(gettext("Du %s au %s"), [
+                    from_date.format('D MMMM').replace(/ /g, '&nbsp;'),
+                    moment(to_date).subtract(1, 'minute').format('D MMMM').replace(/ /g, '&nbsp;')
+                ]);
+                break;
+        }
+    %>
+    <%= body %>
+</div>

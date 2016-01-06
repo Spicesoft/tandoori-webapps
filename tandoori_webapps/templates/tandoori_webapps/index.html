@@ -1,0 +1,66 @@
+{% extends "tandoori_webapps/webapps_base.html" %}
+
+{% load bootstrap i18n static_utils app_tags %}
+
+{% block css %}
+
+<style type="text/css">
+
+  .demo-card-square.mdl-card {
+    width: 320px;
+    height: 320px;
+  }
+  .demo-card-square > .mdl-card__cowork{
+    color: #fff;
+    background: url("/site_media/static/img/webapps_logo/cowork.png") center / cover;
+  }
+
+  {% for app in webapps %}{% with "img/webapps_logo/"|add:app.slug|add:".png" as logo %}
+    .demo-card-square > .mdl-card__{{app.slug}}{
+      color: #fff;
+      background: url('/site_media/static/{{logo}}') center / cover;
+    }
+  {% endwith %}{% endfor %}
+</style>
+
+{% endblock css %}
+
+{% block title %}{% trans "Webapps" %}{% endblock title %}
+
+{% block app_title %}{% trans "Apps." %}{% endblock app_title %}
+
+{% block content %}
+
+<div class="demo-cards mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid mdl-cell--middle">
+  {% for app in webapps %}
+    <div class="mdl-card mdl-shadow--2dp demo-card-square">
+      <div class="mdl-card__title mdl-card--expand mdl-card__{{app.slug}}">
+        <h2 class="mdl-card__title-text" style="">{{ app.name }}</h2>
+      </div>
+      <div class="mdl-card__supporting-text">
+        {{ app.description }}
+      </div>
+      <div class="mdl-card__actions mdl-card--border">
+        <a href="{% app_href app.apk_call %}%3Fnfc=auth" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+          {% trans "Launch" %}
+        </a>
+      </div>
+    </div>
+  {% endfor %}
+  <div class="mdl-card mdl-shadow--2dp demo-card-square">
+    <div class="mdl-card__title mdl-card--expand mdl-card__cowork">
+      <h2 class="mdl-card__title-text" style="">Cowork.io</h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+      {% trans "Interface Cowork avec support du NFC." %}
+    </div>
+    <div class="mdl-card__actions mdl-card--border">
+      <a href="{% app_href 'cowork.app://monolith/?url={host}%2Fnfc%2F%3Fnfc=true' %}" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+        {% trans "Launch" %}
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+

@@ -1,0 +1,29 @@
+<% /* list is prepended here by the view */ %>
+<% var offline = Tandoori.reservation.data.offline %>
+
+<span class="js-reservations-placeholder"><%= gettext("Merci de faire votre choix") %></span>
+<form class="js-reservations-form">
+
+    <% if (!offline) { %>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" class="js-reservations-validate-checkbox">
+            <%= gettext("Acceptation des <a data-toggle='modal' data-target='#security-notice-modal'>consignes de sécurité</a>") %>
+        </label>
+    </div>
+    <% } %>
+
+    <% if (offline) { %>
+    <div class="reservations-total">
+      <strong><%= gettext("Total HT : ") %></strong>
+      <span class="js-reservations-total"><%= price %></span>
+    </div>
+    <% } %>
+
+    <input
+      type="submit"
+      class="btn btn-success js-reservations-validate-btn"
+      value="<%= offline ? gettext("Purchase") : gettext("Book") %>"
+    />
+</form>
+<a class="btn btn-tandoori-blue js-reservations-buy-btn"><%= gettext("Purchase credits") %></a>

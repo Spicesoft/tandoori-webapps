@@ -1,0 +1,109 @@
+{% extends "tandoori_webapps/webapps_base.html" %}
+
+{% load bootstrap i18n static_utils %}
+
+{% block css %}
+  {% fullcalendar_css %}
+  <style type="text/css">
+    .fc-widget-content {
+      height: 2.5em !important;
+    }
+  </style>
+{% endblock css %}
+
+{% block title %}
+    Conciergerie
+{% endblock title %}
+
+{% block app_title %}
+    Conciergerie
+{% endblock app_title %}
+
+{% block content %}
+
+<h3>Rechercher une société ou une personne.</h3>
+<form action="#">
+  <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-demo">
+      <input class="mdl-textfield__input" type="text" id="search_input">
+      <label class="mdl-textfield__label" for="search_input"><i class="material-icons">search</i></label>
+    </div>
+  </div>
+  <div id="searchlist" class="list-group" data-call='{% url "concierge_sms" %}'>
+    {% for account in object_list %}
+      <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-grid">
+        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-lastname="{{ account.last_name|lower }}" data-firstname="{{ account.first_name|lower }}">{{ account }}</a>
+        <button data-number="{{ account.phone_number }}" data-type="sms" class="trigger_sms mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored">
+          <i class="material-icons">subject</i>
+        </button>
+        <button data-number="{{ account.phone_number }}" data-type="call" class="trigger_call mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored">
+          <i class="material-icons">phone</i>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+</form>
+
+{% endblock content %}
+
+{% block js %}
+    <script type="text/javascript" src="//static.twilio.com/libs/twiliojs/1.2/twilio.min.js"></script>
+    <script>
+
+    $(document).ready(function(){
+
+        function filter_list(){
+            var search = $("#search_field").val().toLowerCase();
+            $("td").each(function( index ) {
+
+                if ($( this ).attr("data-firstname").substring(search) || $( this ).attr("data-lastname").substring(search) ){
+                    $( this).show();
+                } else {
+                    $( this).hide();
+                }
+
+              console.log( index + ": " + $( this ).text() );
+            });
+        }
+
+        setTimeout(function(){
+            $("#search").click();
+        }, 4000);
+
+        $("#search").on("change", function(){
+            filter_list();
+        });
+
+        Twilio.Device.setup("{{ capacity }}", { debug: true, rtc: true });
+              Twilio.Device.ready(function (device) {
+            $("#log").text("Ready");
+          });
+
+          Twilio.Device.error(function (error) {
+            $("#log").text("Error: " + error.message);
+          });
+
+          Twilio.Device.connect(function (conn) {
+            $("#log").text("Successfully established call");
+          });
+
+          function call() {
+            Twilio.Device.connect({ "tocall" : "+33675868719"});
+          }
+
+        var url_call=$("#searchlist").attr("data-call");
+
+        $("button[data-type=sms]").on("click", function(e){
+            console.log("sms");
+            $.ajax(url_call);
+        });
+
+        $("button[data-type=call]").on("click", function(e){
+            console.log("call");
+            call();
+        });
+
+
+    });
+    </script>
+{% endblock js %}

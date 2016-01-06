@@ -1,0 +1,134 @@
+{% load bootstrap i18n static_utils app_tags%}
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Cowork.io webapps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock title %}</title>
+
+    <!-- Page styles -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.blue-light_blue.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <style>
+
+        .mdl-layout__header {
+            background-color: #55b774 !important;
+        }
+        .mdl-layout__content {
+            background-color: #DCE8E5 !important;
+        }
+        .mdl-button--accent.mdl-button--accent.mdl-button--raised{
+                        background-color: #55b774 !important;
+            color:white;
+
+        }
+        .mdl-button--fab.mdl-button--colored{
+                        background-color: #55b774 !important;
+            color:white;
+
+        }
+        .mdl-card{
+            margin-top:100px;
+            margin-right:10px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .side-nav-wrapper .legal {
+            border-top: 1px solid #e0e0e0;
+            bottom: 0;
+            color: #212121;
+            font-size: 13px;
+            height: 96px;
+            line-height: 24px;
+            padding: 24px;
+            position: absolute;
+            width: 100%
+        }
+
+        @media screen and (max-width: 760px) {
+            .side-nav-wrapper .legal {
+                height: 80px;
+                padding: 16px 24px
+            }
+        }
+
+        .side-nav-wrapper .copyright {
+            margin: 0
+        }
+    </style>
+      {% block css %}{% endblock css %}
+    </head>
+    <body>
+        <div class="demo-layout">
+            <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+                <header class="mdl-layout__header">
+                    <div class="mdl-layout__header-row">
+                        {% if tenant.logo %}
+                            <img height="65px" class="android-logo-image" src="{{ tenant.logo.url }}">
+                        {% else %}
+                            <span class="mdl-layout-title">{{tenant.name}}</span>
+                        {% endif %}
+
+                        {% block header_center %}
+                        {% endblock header_center %}
+
+                        <div class="mdl-layout-spacer"></div>
+
+                        <div class="mdl-textfield--align-right">
+                            <h1 id="time_watch"></h1>
+                        </div>
+                    </div>
+                </header>
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">{{tenant.name}}</span>
+                <nav class="mdl-navigation">
+                    {% for app in webapps %}
+                        <a class="mdl-navigation__link" href="{% app_href app.apk_call %}">{{app.name}}</a>
+                    {% endfor%}
+                </nav>
+            </div>
+            <main class="mdl-layout__content">
+                <div class="page-content">
+                    {% block content %}{% endblock content %}
+                </div>
+            </main>
+            {% block footer %}
+            {% endblock footer%}
+            </div>
+        </div>
+        </body>
+
+
+
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+        <script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.min.js"></script>
+        {% block js %}{% endblock js %}
+
+        <script>
+
+            setInterval(function(){
+                var currentTime = new Date()
+                var hours = currentTime.getHours()
+                var minutes = currentTime.getMinutes()
+                if (minutes < 10){
+                    minutes = "0" + minutes
+                }
+                $("#time_watch").html(hours + ":" + minutes);
+            }, 1000);
+
+            $(document).ready(function() {
+                setTimeout(function(){
+                    $("#id_username").focus();
+                }, 1000);
+
+            });
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,911 @@
+{% extends "tandoori_webapps/webapps_base.html" %}
+
+{% load bootstrap i18n static_utils %}
+
+{% block css %}
+    {% fullcalendar_css %}
+    <style>
+
+
+        #status_indicator{
+            height:40px;
+        }
+
+        .green{
+                        background-color: #55b774 !important;
+            color:white;
+
+        }
+        .red{
+                        background-color: red !important;
+
+        }
+        .button-overlay {
+            background-color: #55b774 !important;
+        }
+
+        body{
+            background-color: #222222;
+        }
+        .fc-title{
+			margin-top: 8px;
+            text-align: center;
+        }
+        .fc-widget-content {
+             height: 2.5em !important;
+        }
+		.fc-toolbar h2{
+			font-size: 30px;
+		}
+		.fc-event-container .fc-time{
+			display:none;
+		}
+		a.fc-time-grid-event.fc-v-event.fc-event.fc-start.fc-end{
+			border:0;
+			margin:1px;
+		}
+		html,body {
+		    background: rgb(20, 45, 56);
+		    width: 100%;
+		    height: 100%;
+		    margin: 0;
+		    padding: 0;
+		    font-family: Roboto;
+		    font-size: 18px;
+		}
+
+		.transition {
+			-webkit-transition: .5s;
+			-moz-transition: .5s;
+			transition: .5s;
+			-webkit-transition-timing-function: cubic-bezier(.4,0,.5,1);
+			-moz-transition-timing-function: cubic-bezier(.4,0,.5,1);
+			transition-timing-function: cubic-bezier(.4,0,.5,1);
+		}
+
+		.centred-text {
+		    position: absolute;
+		    left: 50%;
+		    top: 30px;
+            z-index:30000;
+		    -webkit-transform: translateX(-50%)translateY(-50%);
+		    -moz-transform: translateX(-50%)translateY(-50%);
+		    transform: translateX(-50%)translateY(-50%);
+		    text-align: center;
+		    cursor: pointer;
+		}
+
+		.centred-text:hover {
+		    opacity: .7;
+		}
+
+
+
+		h1 {
+		    color: #fff;
+		    font-weight: 100;
+		}
+
+		.form-container {
+		    position: absolute;
+		    width: 600px;
+		    height: 300px;
+		    background: #f2f2f2;
+		    -webkit-border-radius: 5px;
+		    -moz-border-radius: 5px;
+		    border-radius: 5px;
+		    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+		    left: 50%;
+		    top: 50%;
+            z-index: 1000;
+		    -webkit-transform: translateX(-50%)translateY(-50%);
+		    -moz-transform: translateX(-50%)translateY(-50%);
+		    transform: translateX(-50%)translateY(-50%);
+		    overflow: hidden;
+		    overflow: hidden;
+		    display: none;
+		}
+
+        .form-container .button {
+		    z-index:1001;
+            color:white;
+		}
+
+		.form-container.close {
+		    width: 150px;
+		    height: 150px;
+		    -webkit-border-radius: 50%;
+		    -moz-border-radius: 50%;
+			border-radius: 50%;
+		    transition: .5s;
+		}
+
+		.form-container.close-all {
+		    width: 0px;
+		    height: 0px;
+		}
+
+		.form-container.close .form-left {
+		    width: 0;
+		    overflow: hidden;
+		    padding: 0;
+		}
+
+		.form-container.close .form-right {
+		    width: 100%;
+		    overflow: hidden;
+		    padding: 0;
+		}
+
+		.form-container.close .message-sent {
+		    font-size: 0;
+		}
+
+		.form-container.close .message-sent span {
+		    margin: 0 auto;
+		}
+
+		.close-form {
+		    position: absolute;
+		    right: 10px;
+		    top: 10px;
+		    z-index: 10000;
+		    background: rgba(0, 0, 0, 0.18);
+		    line-height: 30px;
+		    width: 30px;
+		    text-align: center;
+		    border-radius: 50%;
+		    font-size: .8em;
+		    font-weight: 300;
+		    text-transform: uppercase;
+		    color: #fff;
+		    cursor: pointer;
+		}
+
+		.form-left {
+		    position: absolute;
+		    width: 70%;
+		    height: 100%;
+		    padding: 20px;
+		    box-sizing: border-box;
+		}
+
+		.form-right {
+		    position: absolute;
+		    right: 0;
+		    top: 0;
+		    width: 30%;
+		    height: 100%;
+		    background: rgb(176, 223, 96);
+		    overflow: hidden;
+		}
+
+		.form-right.error {
+		    -webkit-animation: 3s error forwards;
+		}
+
+		@-webkit-keyframes error {
+			0% {background: rgb(176, 223, 96)}
+			25% {background: rgb(250, 89, 89)}
+			75% {background: rgb(250, 89, 89)}
+			100% {background: rgb(176, 223, 96)}
+		}
+
+		.span {
+		    position: absolute;
+		    width: 100%;
+		    height: 1px;
+		    background: rgb(192, 192, 192);
+		    bottom: 0px;
+		    -webkit-transition: .5s;
+			-moz-transition: .5s;
+			transition: .5s;
+		}
+
+		.span.active {
+		    top: auto;
+		    bottom: 0px;
+		}
+
+		.label-line {
+		    position: relative;
+		    height: 50px;
+		    margin: 0 0 10px;
+		}
+
+		.label-line.textarea {
+		    height: 100px;
+		}
+
+		.span:before {
+		    content: "";
+		    width: 0;
+		    left: 50%;
+		    height: 2px;
+		    background: rgb(0, 189, 160);
+		    position: absolute;
+			-webkit-transition: .5s;
+			-moz-transition: .5s;
+			transition: .5s;
+		}
+
+		.label-line.active .span:before {
+		    width: 100%;
+		    left: 0%;
+		    height: 2px;
+		    background: rgb(0, 189, 160);
+		}
+
+		.button img {
+		    opacity: .3;
+		    margin: auto;
+		    display: block;
+		}
+
+		.button {
+		    text-align: center;
+		    position: absolute;
+		    width: 100%;
+		    top: 50%;
+		    -webkit-transform: translateY(-50%);
+		    -moz-transform: translateY(-50%);
+		    transform: translateY(-50%);
+		}
+
+		.button-overlay {
+		    position: absolute;
+		    width: 100%;
+		    height: 100%;
+		    z-index: 100;
+		}
+
+		.button span {
+		    margin: 20px 0 0;
+		    display: block;
+		    color: #fff;
+		    font-weight: 100;
+		    text-transform: uppercase;
+		}
+
+		/* MATERIAL */
+
+		/*.ink styles - the elements which will create the ripple effect. The size and position of these elements will be set by the JS code. Initially these elements will be scaled down to 0% and later animated to large fading circles on user click.*/
+		.ink {
+			display: block; position: absolute;
+			background: rgb(0, 189, 160);
+			-webkit-border-radius: 100%;
+			-moz-border-radius: 100%;
+			border-radius: 100%;
+			-webkit-transform: scale(0);
+			-moz-transform: scale(0);
+			-o-transform: scale(0);
+			transform: scale(0);
+			z-index: 3;
+		}
+		/*animation effect*/
+		.ink.animate {
+			-webkit-animation: ripple 0.65s forwards;
+			-moz-animation: 'ripple' 0.65s forwards;
+			-o-animation: ripple 0.65s forwards;
+			animation: ripple 0.65s forwards;
+		}
+
+		@-webkit-keyframes ripple {
+			100% {-webkit-transform: scale(2.5);}
+		}
+
+		@-moz-keyframes 'ripple' {
+			100% {-moz-transform: scale(2.5);}
+		}
+
+		@-o-keyframes ripple {
+			100% {-o-transform: scale(2.5);}
+		}
+
+		@keyframes ripple {
+			100% {transform: scale(2.5);}
+		}
+
+		/* MESSAGE SENT */
+
+		.message-sent {
+		    width: 100%;
+		    top: 50%;
+		    position: absolute;
+		    -webkit-transform:translateY(-50%);
+		    -moz-transform:translateY(-50%);
+		    transform:translateY(-50%);
+		    text-align: center;
+		    color: #fff;
+		    font-weight: 100;
+		    text-transform: uppercase;
+		    display: none;
+		    z-index: 1000;
+		}
+
+		.message-sent span {
+		    width: 60px;
+		    height: 60px;
+		    display: block;
+		    margin: auto;
+		    margin-bottom: 10px;
+		    position: relative;
+		}
+
+		.message-sent span:before, .message-sent span:after {
+			-webkit-transition: .5s;
+			-moz-transition: .5s;
+			transition: .5s;
+			-webkit-transition-timing-function: cubic-bezier(.4,0,.5,1);
+			-moz-transition-timing-function: cubic-bezier(.4,0,.5,1);
+			transition-timing-function: cubic-bezier(.4,0,.5,1);
+		}
+
+		.message-sent span:before {
+		    content: "";
+		    position: absolute;
+		    width: 0px;
+		    height: 10px;
+		    background: white;
+		    -webkit-transform: rotate(-45deg);
+		    -moz-transform: rotate(-45deg);
+		    transform: rotate(-45deg);
+		    -webkit-border-radius: 5px;
+		    -moz-border-radius: 5px;
+		    border-radius: 5px;
+		    top: 44px;
+		    left: 16px;
+		    -webkit-transform-origin: top left;
+		    -moz-transform-origin: top left;
+		    transform-origin: top left;
+		}
+
+		.message-sent span:after {
+		    content: "";
+		    position: absolute;
+		    width: 0px;
+		    height: 10px;
+		    background: white;
+		    -webkit-transform: rotate(225deg);
+		    -moz-transform: rotate(225deg);
+		    transform: rotate(225deg);
+		    -webkit-border-radius: 5px;
+		    -moz-border-radius: 5px;
+		    border-radius: 5px;
+		    top: 51px;
+		    left: 23px;
+		    -webkit-transform-origin: top left;
+		    -moz-transform-origin: top left;
+		    transform-origin: top left;
+		}
+
+		.message-sent.active span:before {
+			width: 50px;
+		}
+
+		.message-sent.active span:after {
+			width: 30px;
+		}
+
+		span.alert {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    background: #FCE570;
+		    z-index: 1000;
+		    padding: 10px 20px;
+		    -webkit-border-radius: 5px;
+		    -moz-border-radius: 5px;
+		    border-radius: 5px;
+		    -webkit-transform: translateX(-50%)translateY(-50%);
+		    -moz-transform: translateX(-50%)translateY(-50%);
+		    transform: translateX(-50%)translateY(-50%);
+		    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+		    font-weight: 300;
+		    display: none;
+		}
+    </style>
+{% endblock css %}
+
+{% block title %}
+    {% trans "Meeting Room" %} {{object}}
+{% endblock title %}
+
+{% block app_title %}
+    {% trans "Meeting Room" %} {{object}}
+{% endblock app_title %}
+
+{% block header_center %}
+<div class="centred-text transition">
+    {% if user.is_authenticated %}
+        {% trans "Hello" %} {{ user.account.first_name }}
+        <button id="logout" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+              {% trans "Logout" %}
+        </button>
+    {% else %}
+        <button id="login" type="button" style="display: hidden;" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+              {% trans "Login" %}
+        </button>
+
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="form-container" style="display: none;">
+        <div class="close-form">x</div>
+        <form method="post" id="login_form" lass="form-inner" action="/login/?next={{ request.path }}">
+            <div class="form-left">
+                {% csrf_token %}
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="text" id="id_username" maxlength="254" name="username" />
+                  <label class="mdl-textfield__label" for="username">{% trans "Username" %}</label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="password" id="id_password" maxlength="254" name="password" />
+                  <label class="mdl-textfield__label" for="password">{% trans "Password" %}</label>
+                </div>
+            </div>
+            <div class="form-right transition">
+                <div class="message-sent">
+                        <span></span>
+                        {% trans "Message sent" %}
+                </div>
+                <div class="button-overlay"></div>
+                <div class="button">
+                    <span>{% trans "GO" %}</span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+	<div class="demo-charts mdl-cell mdl-cell--12-col mdl-grid">
+	<div id="status_indicator" class="demo-charts  mdl-cell mdl-cell--8-col mdl-grid">
+        <div id="state_panel" class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+            <div id="state_panel_color" class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-grid">
+                <h2>{% trans "Free" %}</h2>
+            </div>
+            <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--8-col mdl-grid">
+                <h2>{{object}}</h2>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+            <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+                <h4>{% trans "Available credits :" %}</h4>
+                <h4 class="credits">1{{ user.account.available_credits_by_category.meeting_room.value|default:0 }}</h4>
+            </div>
+            <div id="state_panel" class="demo-charts mdl-color--white mdl-shadow--4dp mdl-cell mdl-cell--12-col mdl-grid">
+
+                <h4 id="state"></h4>
+                <div id="bookings">
+                    <p>{% trans "No booking, click on free slot !" %}</p>
+                </div>
+                <hr>
+                <button id="book" type="button" style="display: hidden;" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+                  {% trans "Book" %}
+                </button>
+            </div>
+        {% endif %}
+
+	</div>
+	<div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-grid">
+        <div id="calendar" class="col-md-5"></div>
+	</div>
+	</div>
+{% endblock content %}
+
+
+{% block js %}
+
+{% fullcalendar_js LANGUAGE_CODE %}
+
+<script>
+
+    var once = true;
+    var calendar = $('#calendar');
+    var bookings = [];
+    var timeout;
+    var credits = {{ user.account.available_credits_by_category.meeting_room.value|default:0 }};
+
+    function reset_timeout(){
+        timeout = 60;
+    }
+    reset_timeout();
+
+    function render_bookings(){
+        $("#book").hide();
+        if (bookings.length > 0){
+            $("#bookings").html("");
+            $("#book").show();
+        }
+        for (i = 0; i < bookings.length; i++) {
+            booking = bookings[i];
+			
+			var out = '<div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">' + booking.start.format("YYYY-MM-DD") + " -> " + booking.start.format("hh:mm") + " " + booking.end.format("hh:mm") + "<br>"+ '<button id="delete_booking" data-id="'+i+'" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored"><i class="material-icons">{% trans "delete" %}</i></button></div>';
+            $("#bookings").append(out);
+
+        }
+        $(".credits").html(credits);
+    }
+
+    function get_events(start, end){
+        return calendar.fullCalendar('clientEvents',function(event) {
+            return ( event.start >= start && event.end <= end );
+        });
+    }
+
+    function current_event() {
+        var diplayed_date = calendar.fullCalendar( 'getDate' );
+        if (moment().diff($("#calendar").fullCalendar( 'getDate' ), 'hours') > 0){
+            return;
+        }
+        once = false;
+        var e = null;
+        var now = moment();
+        var morning = moment(now).set("hour", 9).set("minute", 0).set("second", 0);
+        var midnight = moment(now).set("hour", 19).set("minute", 59).set("second", 59);
+
+        var events = get_events(morning, midnight);
+
+        events.forEach(function(event) {
+            if (
+                typeof(event.bookable) == "undefined" &&
+                event.start < now &&
+                event.end > now
+            ){
+                e = event;
+            }
+        });
+
+        var message, color;
+
+        if (e == null) {
+            message = "{% trans 'Available' %}";
+            color = "green";
+        } else {
+            //message = e.title + " " + e.start.format("h:mm") + " " + e.end.format("h:mm");
+            message = "{% trans 'Occupied' %}";
+            color = "red";
+        }
+
+
+        $("#state_panel_color h2").html(message);
+        $("#state_panel_color").addClass(
+                color
+        );
+
+        return e;
+    }
+
+    function add_booking_events(callback, start, end){
+
+        var events= [];
+        var events_out = [];
+        start = new Date(start).toISOString();
+        end= new Date(end).toISOString();
+        $.ajax({
+            url: "{% url 'external_api:period-active' %}?service={{ object.service.id }}&start=" + start + "&end=" + end,
+            async: false,
+            dataType: 'json',
+            success: function(data) {
+                events = data;
+                events_out = events.slice(0);
+            }
+        });
+
+        once=false;
+
+        var curr_date = calendar.fullCalendar( 'getDate' );
+
+        var morning = moment(curr_date).set("hour", 9).set("minute", 0).set("second", 0);
+        var midnight = moment(curr_date).set("hour", 20).set("minute", 59).set("second", 59);
+		console.log(events);
+
+        var curr_slot = moment(morning);
+        var next_slot = moment(morning);
+        while ( events.length>0 && curr_slot.isBefore(midnight)) {
+            next_slot = moment(curr_slot).add(30, "minute");
+			var found = false;
+			
+            for (i = 0; i < events.length; i++) {
+                event = events[i];
+
+                if (
+                        moment(event.start).hours() == curr_slot.hours() ||
+                        moment(event.start).minutes() == curr_slot.minutes()
+                ){
+					found = true;
+					break;
+					
+                }
+				found  = false;
+
+            };
+			
+			if( !(found) ){
+                var new_event = new Object();
+                new_event.title = "Occupé : "+ event.title;
+                new_event.allDay = false;
+                new_event.color = "red";
+                new_event.start = curr_slot;
+                new_event.end = next_slot;
+				new_event.className = "tata";
+                events_out.push(new_event);
+			}
+			found = false;
+			
+            curr_slot = moment(next_slot);
+        }
+	
+        var curr_date = calendar.fullCalendar( 'getDate' );
+
+        var orning = moment(curr_date).set("hour", 9).set("minute", 0).set("second", 0);
+        var midnight = moment(curr_date).set("hour", 20).set("minute", 59).set("second", 59);	
+		console.log(events_out);
+        var curr_slot2 = moment(morning);
+        var next_slot2 = moment(morning);
+
+		if (events_out.length == events.length ){
+			var iter = 0;
+			while (iter < 20) {
+	            next_slot2 = moment(curr_slot2).add(30, "minute");
+				
+                var new_event = new Object();
+                new_event.title = "{% trans 'Available' %}";
+                new_event.allDay = false;
+                new_event.color = "green";
+                new_event.start = curr_slot2;
+                new_event.end = next_slot2;
+                new_event.bookable = true;
+				new_event.className = "toto";
+                events_out.push(new_event);
+                curr_slot2 = moment(next_slot2);
+				iter += 1;
+			}
+		}
+		
+		
+        callback(events_out);
+    }
+
+    $(document).ready(function(){
+        $.ajaxSetup({
+             beforeSend: function(xhr, settings) {
+                 function getCookie(name) {
+                     var cookieValue = null;
+                     if (document.cookie && document.cookie != '') {
+                         var cookies = document.cookie.split(';');
+                         for (var i = 0; i < cookies.length; i++) {
+                             var cookie = jQuery.trim(cookies[i]);
+                             // Does this cookie string begin with the name we want?
+                         if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                             cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                             break;
+                         }
+                     }
+                 }
+                 return cookieValue;
+                 }
+                 if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                     // Only send the token to relative URLs i.e. locally.
+                     xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                 }
+             }
+        });
+
+	
+		$('#login').click(function(){
+			if($('.form-container').hasClass('close')){
+				//alert('Message already sent!');
+				if (confirm('Message already sent! Wanna send another one?')) {
+				    $('.form-container').fadeIn();
+				    $('.form-container').removeClass('close');
+				    $('.form-container').removeClass('close-all');
+					$('.close-form').fadeIn();
+					$('.message-sent').removeClass('active').fadeOut();
+					$('.ink').remove();
+					$('.label-line').removeClass('active');
+					$('.input').val('');
+				} else {
+				    // Do nothing!
+				}
+			}
+			else{
+				$('.form-container').fadeIn();
+				$('.close-form').fadeIn();
+			}
+		});
+        $('#logout').click(function(){
+			window.location.href="/logout/?next={{ request.path }}";
+		});
+		
+		$('.input').blur(function(){
+		    if( $(this).val() ) {
+		        $(this).parent('.label-line').addClass('active checked');
+		    } else {
+			    $(this).parent('.label-line').removeClass('active checked');
+			    //alert('no');
+		    }
+		});
+		
+		$('.label-line').click(function(){
+			$(this).addClass('active');
+			if ($('.label-line').hasClass('checked')){}
+			else{
+				$('.label-line').removeClass('checked');
+			}
+			/*$(this).children('.span').addClass('active');
+			$(this).children('.label').addClass('active');*/
+		});	
+		
+		$('.form-right').click(function(e) {
+            $('#login_form').submit();
+        });
+
+		
+		$('.close-form').click(function(){
+			$('.form-container').fadeOut();
+		});	
+		
+	
+
+
+        calendar = $('#calendar');
+
+        calendar.fullCalendar({
+            header: {
+                left: 'prev',
+                center: 'title',
+                right: 'next'
+            },
+            eventColor: 'red',
+            timezone: "local",
+            minTime: "09:00:00",
+            maxTime: "19:00:00",
+            height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
+            defaultView: 'agendaDay',
+            allDaySlot: false,
+            businessHours: {
+                start: '9:00', // a start time (10am in this example)
+                end: '19:00', // an end time (6pm in this example)
+                dow: [ 1, 2, 3, 4 , 5]
+            },
+            selectable: true,
+            events: function(start, end, timezone, callback) {
+                add_booking_events(callback,start, end);
+                render_bookings();
+            },
+			eventAfterAllRender: function(){
+				$("a.fc-time-grid-event.fc-v-event.fc-event.fc-start.fc-end:not(.toto)").css("left",0).css("right","-2px");;
+				$("a.fc-time-grid-event.fc-v-event.fc-event.fc-start.fc-end.toto").css("left",0).css("right","-2px");;
+                $(".toto").css("width",'100%').css("right","-2px");
+                current_event();
+			},
+            eventClick: function(calEvent, jsEvent, view) {
+                reset_timeout();
+
+				if (typeof(calEvent.bookable) == "undefined"){
+					return;
+				}
+
+                {% if not user.is_authenticated %}
+                    $("#login").click();
+                    return;
+                {% endif %}
+
+                if (credits == 0){
+                    alert("{% trans 'Not enough credits.' %}");
+                    return;
+                }
+                credits = credits - 1;
+                bookings.push(calEvent);
+                render_bookings();
+                // change the border color just for fun
+                $(this).css('background-color', 'gray');
+
+            },
+            viewRender: function(currentView){
+                var minDate = moment(),
+                maxDate = moment().add(2,'weeks');
+                // Past
+                if (minDate >= currentView.start && minDate <= currentView.end) {
+                    $(".fc-prev-button").prop('disabled', true);
+                    $(".fc-prev-button").addClass('fc-state-disabled');
+                }
+                else {
+                    $(".fc-prev-button").removeClass('fc-state-disabled');
+                    $(".fc-prev-button").prop('disabled', false);
+                }
+                // Future
+                if (maxDate >= currentView.start && maxDate <= currentView.end) {
+                    $(".fc-next-button").prop('disabled', true);
+                    $(".fc-next-button").addClass('fc-state-disabled');
+                } else {
+                    $(".fc-next-button").removeClass('fc-state-disabled');
+                    $(".fc-next-button").prop('disabled', false);
+                }
+            }
+        });
+
+        $("#book").on("click", function(){
+            reset_timeout();
+            var all_bookings = [];
+            console.log(bookings);
+
+
+            var booking = bookings[i];
+            var json_object = new Object();
+            json_object.center = 1;
+            json_object.account = {{ user.account.pk|default:0 }};
+            json_object.service_type = {{ object.service.type.id }};
+            json_object.reservations = [];
+            for (var i = 0; i < bookings.length; i++) {
+                var booking = bookings[i];
+                var resa = new Object();
+                resa.from_date = new Date(booking.start).toISOString();
+                resa.to_date = new Date(booking.end).toISOString();
+                resa.service = {{object.service_id}};
+                resa.unit = "hh";
+                json_object.reservations.push();
+            };
+            all_bookings.push(json_object);
+
+            $.ajax({
+                method: "POST",
+                url: "{% url 'internal_api:reservation-list' %}",
+                contentType: "application/json",
+                data: JSON.stringify(all_bookings),
+                error: function(data) {
+                    console.log(data);
+                },
+                success: function(data){
+                    console.log(data);
+                    return data;
+                    var error=false;
+					for (var i = 0; i < data.length; i++) {
+						var res = data[i];
+						if (i.success == false){
+							error=true;
+						}
+					}
+					
+					if (error){
+						alert("{% trans 'Apologies :( We can not fulfill your request. Please try again later or scream real loud !' %}")
+					} else {
+						alert("{% trans 'Booked! You are good to go !' %}");
+					}
+
+                    window.location.href = "/logout/?next={{ request.path }}";
+                }
+            });
+
+        });
+        $("#delete_booking").on("click", function(){
+           
+
+        });
+
+        if ($("#logout")) {
+            setInterval(function () {
+                timeout -= 1;
+                timeout_out = timeout;
+                if (timeout < 10) {
+                    timeout_out = "0" + timeout;
+                }
+                $("#logout").html("Logout " + timeout);
+
+                if (timeout == 0) {
+                    window.location.href = "/logout/?next={{ request.path }}";
+                }
+
+            }, 1000);
+        }
+
+        setInterval(current_event, 10000);
+
+    });
+</script>
+{% endblock js %}

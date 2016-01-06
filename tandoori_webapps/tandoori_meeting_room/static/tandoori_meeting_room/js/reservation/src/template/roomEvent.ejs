@@ -1,0 +1,22 @@
+<%
+    var successClass = "";
+    if (success != null) {
+        successClass = success ? "reservation-success" : "reservation-error";
+    }
+%>
+<div class="panel-body <%= successClass %>">
+    <button type="button" class="close js-reservation-event-delete" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h3 class="panel-title"><%= resource && resource.title %></h3>
+    <% if (from_date.isSame(to_date, "day")) {  %>
+        <%= interpolate(gettext("Le %s de %s à %s"), [
+            from_date.format("D MMMM").replace(/ /g, "&nbsp;"),
+            from_date.format("H:mm"),
+            to_date.format("H:mm")
+        ]) %>
+    <% } else { %>
+        <%= interpolate(gettext("Du %s au %s"), [
+            from_date.format("D MMMM, H:mm").replace(/ /g, "&nbsp;"),
+            to_date.format("D MMMM, H:mm").replace(/ /g, "&nbsp;")
+        ]) %>
+    <% } %>
+</div>

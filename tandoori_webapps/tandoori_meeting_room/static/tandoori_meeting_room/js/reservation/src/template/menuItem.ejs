@@ -1,0 +1,17 @@
+<% if (header) { %>
+    <%= text %>
+<% } else { %>
+    <a href="#" tabindex="-1" role="menuitem">
+        <%= text %>
+        <% if (label) { %>
+            <span class="label label-<%= label.type || 'default'%>">
+                <%= label.text %>
+            </span>
+        <% } %>
+        <% if (rightText) { %>
+            <span class="pull-right right-text">
+                <%= rightText %>
+            </span>
+        <% } %>
+    </a>
+<% } %>
